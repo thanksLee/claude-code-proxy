@@ -1,0 +1,38 @@
+services:
+  claude-proxy:
+    restart: always
+    build:
+      context: .
+      dockerfile: dockerfile
+    image: allyou/claude-proxy
+    container_name: allyou-claude-proxy
+    environment:
+      - ANTHROPIC_API_KEY=your-anthropic-api-key # Needed if proxying *to* Anthropic
+      - OPENAI_API_KEY=dummy-key
+      - GEMINI_API_KEY=your-google-ai-studio-key
+      - PREFERRED_PROVIDER=openai
+      - BIG_MODEL=qwen2.5-coder:14b
+      - SMALL_MODEL=qwen3:1.7b
+      - API_URL=http://localhost:11434
+      - OPENAI_BASE_URL=http://localhost:11434/v1
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "3"
+        max-size: "10m"
+    ports:
+      - 5022:8082
+    networks:
+      - dev-net
+
+networks:
+  dev-net:
+    name: dev-net
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.50.0.0/16
+          gateway: 172.50.0.1
+
+
